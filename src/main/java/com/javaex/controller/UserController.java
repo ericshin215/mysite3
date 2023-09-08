@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.javaex.dao.UserDao;
 import com.javaex.util.WebUtil;
@@ -74,6 +75,102 @@ public class UserController extends HttpServlet {
 			
 			
 			WebUtil.forward(request, response, "/WEB-INF/views/user/loginForm.jsp");
+		}
+		
+		else if ("login".equals(action)) {
+			//로그인
+			System.out.println("action=login");
+			
+			//파라미터꺼내기
+			String id = request.getParameter("id");
+			String password = request.getParameter("pw");
+			
+			
+			//vo로 묶기
+			UserVo userVo = new UserVo();
+			userVo.setId(id);
+			userVo.setPassword(password);
+			
+			System.out.println(userVo);
+			
+			
+			//Dao를 통해 로그인한 사용자가 있는지 확인한다
+			UserDao userDao = new UserDao();
+			UserVo authUser = userDao.userSelect(userVo);
+			
+			System.out.println(authUser);
+			//authUser null 이면 로그인실패
+			//authUser null이 아니면 로그인 성공
+			
+			if(authUser != null) {
+				HttpSession session = request.getSession();
+				session.setAttribute("authUser", authUser);
+				
+				
+				WebUtil.redirect(request, response, "/mysite3/main"); 
+				
+				
+			}
+			else {
+				WebUtil.redirect(request, response, "/mysite3/user?action=loginForm&result=fail");
+				
+			}
+			
+
+			
+			//세션에 값넣기
+			
+			
+			
+			//WebUtil.forward(request, response, "/WEB-INF/views/user/loginForm.jsp");
+		}else if("logout".equals(action)) {
+			System.out.println("action=logout");
+			
+			HttpSession session = request.getSession();
+			session.invalidate();
+			
+			WebUtil.redirect(request, response, "/mysite3/main"); 
+		}else if ("modifyForm".equals(action)) {
+			
+			
+			WebUtil.forward(request, response, "/WEB-INF/views/user/modifyForm.jsp");
+		}else if ("modify".equals(action)) {
+			
+			
+			
+			int no = Integer.parseInt(request.getParameter("no"));
+			String id= request.getParameter("id");
+			String name= request.getParameter("name");
+			String password = request.getParameter("password");
+			String gender = request.getParameter("gender");
+			
+			UserVo userVo = new UserVo(no,id,name,password,gender);
+			//System.out.println(userVo);
+			UserDao userDao = new UserDao();
+			userDao.userUpdate(userVo);
+			//System.out.println(userVo);
+			
+			
+			
+			
+			HttpSession session = request.getSession();
+			session.invalidate();
+			
+			UserVo authUser = userDao.userSelect(userVo);
+			session = request.getSession();
+			session.setAttribute("authUser", authUser);
+			
+			System.out.println(authUser);
+			
+			WebUtil.redirect(request, response, "/mysite3/main"); 
+			
+//			userVo.setNo(no);
+//			userVo.setName(name);
+//			userVo.setPassword(password);
+//			userVo.setGender(gender);
+			
+			
+			
 		}
 		
 		

@@ -15,6 +15,13 @@ public class UserVo {
 	public int getNo() {
 		return no;
 	}
+	public UserVo() {
+		super();
+		
+	}
+	
+	
+	
 	
 	
 	public UserVo(String id, String name, String password, String gender) {

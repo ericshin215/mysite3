@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.javaex.vo.UserVo;
+import com.javaex.vo.UserVo;
 public class UserDao {
 	
 	// 필드
@@ -98,6 +99,105 @@ public class UserDao {
 
 			return count;
 		
+			
+		}
+		
+		public int userUpdate(UserVo userVo) {
+
+			int count = -1;
+
+			this.getConnect();
+
+			try {
+				// 3. SQL문 준비 / 바인딩 / 실행
+				// SQL문 준비
+				String query = "";
+				query += " update users ";
+				query += " set name = ?, ";
+				query += " 	   password = ?, ";
+				query += "     gender = ? ";
+				query += " where no = ? ";
+				
+				pstmt = conn.prepareStatement(query);
+
+				// 바인딩
+				pstmt.setString(1, userVo.getName());
+				pstmt.setString(2, userVo.getPassword());
+				pstmt.setString(3, userVo.getGender());
+				pstmt.setInt(4,userVo.getNo());
+
+				// 실행
+				count = pstmt.executeUpdate();
+
+				// 4.결과처리
+				 System.out.println(count + "건 등록되었습니다.");
+
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
+			this.close();
+
+			return count;
+
+		}
+
+		
+		
+		public UserVo userSelect(UserVo userVo) {
+			UserVo authUser = null;
+			this.getConnect();
+
+			try {
+				// 3. SQL문 준비 / 바인딩 / 실행
+				// SQL문 준비
+				String query = "";
+				query += " select no, ";
+				query += "  id, ";
+				query += "         password, ";
+				query += "            name,  ";
+				query += "            gender  ";
+				query += " from users ";
+				query += " where id = ? ";
+				query += " and password = ? ";
+
+				pstmt = conn.prepareStatement(query);
+		
+				// 바인딩 vo에서 값을 setter로 꺼낸다
+				pstmt.setString(1, userVo.getId());
+				pstmt.setString(2, userVo.getPassword());
+				// 실행
+				rs = pstmt.executeQuery();
+				// 4.결과처리
+				rs.next();
+				int no = rs.getInt(1);
+				String id = rs.getString(2);
+				String password = rs.getString(3);
+				String name = rs.getString(4);
+				String gender= rs.getString(5);
+				// System.out.println(count + "건 등록되었습니다.");
+				
+				//vo로 묶기
+				authUser = new UserVo();
+				authUser.setNo(no);
+				authUser.setPassword(password);
+				authUser.setId(id);
+				authUser.setGender(gender);
+				
+				authUser.setName(name);
+				
+				//System.out.println(authUser);
+
+			} catch (SQLException e) {
+				System.out.println("error:" + e);
+			}
+
+			this.close();
+			
+			return authUser;
+
+			
+			
 			
 		}
 	
